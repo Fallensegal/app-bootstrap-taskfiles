@@ -1,0 +1,184 @@
+version: '3'
+
+tasks:
+
+  default:
+    silent: true
+    cmds:
+      - task --list --sort=none
+  all:
+    cmds:
+      - task: format
+      - task: lint
+      - task: check
+      - task: test
+
+  install:
+  desc: Install Python Dev Dependencies
+  run: once
+  cmds:
+    - uv venv .venv
+    - uv pip sync requirements-dev.txt
+    - cp requirements-dev.txt .venv/lockfile
+  sources:
+    - requirements-dev.txt
+  generates:
+    - .venv/lockfile
+  deps: [requirements-dev]
+
+  format:
+    desc:
+    cmds:
+      - .venv/bin/ruff format --check .
+    deps: [install]
+
+  lint:
+    desc:
+    cmds:
+      - .venv/bin/ruff check --no-fix .
+    deps: [install]
+
+  check:
+    desc:
+    cmds:
+      - .venv/bin/mypy .
+    deps: [install]
+
+  test:
+    desc:
+    cmds:
+      - .venv/bin/mypy .
+    deps: [install]
+  
+  requirements-dev:
+    run: once
+    cmds:
+      - uv pip compile requirements-dev.in -o requirements-dev.txt
+    deps: [requirements]
+    sources:
+      - requirements.in
+      - requirements-dev.in
+    generates:
+      - requirements-dev.txt
+  
+  requirements:
+    run: once
+    cmds:
+      - uv pip compile requirements.in -o requirements.txt
+    sources:
+      - requirements.in
+    generates:
+      - requirements.txt
+
+  init:
+    cmds:
+      - task: init:git
+      - task: init:devbox
+      - task: init:direnv
+      - task: init:devcontainer
+      - task: init:pyproject
+      - task: init:requirements
+      - task: init:requirements-dev
+      - task: init:project
+      - task: init:test
+
+  init:git:
+    cmds:
+      - git init
+    status:
+      - test -d .git
+  
+  init:devbox:
+    cmds:
+      - devbox init
+      - devbox add git go-task python uv
+    status:
+      - test -f devbox.json
+  
+  init:direnv:
+    cmds:
+      - devbox generate direnv
+    status:
+      - test -f .envrc
+  
+  init:devcontainer:
+    cmds:
+      - devbox generate devcontainer
+    status:
+      - status -f .devcontainer/devcontainer.json
+  
+  init:pyproject:
+    cmds:
+      - |
+        cat <<EOF>> pyproject.toml
+        [project]
+        name = "example"
+        version = "0.1.0"
+
+        [tool.mypy]
+        strict = true
+
+        [tool.ruff.lint]
+        select = ["ALL"]
+        ignore = ["D100", "D101", "D103", "D104", "D105", "D106", "D107", "D203", "D212", "COM812", "ISC001"]
+
+        [tool.ruff.lint.per-file-ignores]
+        "tests/**/*.py" = [
+            "S101", # asserts allowed in tests...
+            "INP001", # dont use __init__.py
+        ]
+
+        EOF
+    status:
+      - test -f pyproject.toml
+  
+  init:requirements:
+    cmds:
+      - |
+        cat <<EOF>> requirements.in
+        uvicorn[standard]
+        fastapi
+        EOF
+    status:
+      - test -f requirements.in
+  
+  init:requirements-dev:
+    cmds:
+      - |
+        cat <<EOF>> requirements-dev.in
+        -e .
+        -r requirements.txt
+
+        mypy
+        pytest
+        ruff
+        EOF
+
+    status:
+      - test -f requirements-dev.in
+  
+  init:project:
+    cmds:
+      - |
+        mkdir -p src/example
+        touch src/example/__init__.py
+    status:
+      - test -f src/example/__init__.py
+  
+  init:test:
+    cmds:
+      - |  
+        mkdir -p tests
+        cat <<EOF>> tests/test_nothing.py
+        import example
+        
+
+        def test_example_can_be_imported() -> None:
+            assert example
+        EOF
+    status:
+      - test -f tests/test_nothing.py
+
+  nuke:
+    cmds:
+      - find . -not -name "{{ .TASKFILE | base }}" -delete
