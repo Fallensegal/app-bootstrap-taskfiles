@@ -14,17 +14,17 @@ tasks:
       - task: test
 
   install:
-  desc: Install Python Dev Dependencies
-  run: once
-  cmds:
-    - uv venv .venv
-    - uv pip sync requirements-dev.txt
-    - cp requirements-dev.txt .venv/lockfile
-  sources:
-    - requirements-dev.txt
-  generates:
-    - .venv/lockfile
-  deps: [requirements-dev]
+    desc: Install Python Dev Dependencies
+    run: once
+    cmds:
+      - uv venv .venv
+      - uv pip sync requirements-dev.txt
+      - cp requirements-dev.txt .venv/lockfile
+    sources:
+      - requirements-dev.txt
+    generates:
+      - .venv/lockfile
+    deps: [requirements-dev]
 
   format:
     desc: Format code in python source files
