@@ -27,27 +27,27 @@ tasks:
   deps: [requirements-dev]
 
   format:
-    desc:
+    desc: Format code in python source files
     cmds:
       - .venv/bin/ruff format --check .
     deps: [install]
 
   lint:
-    desc:
+    desc: Lint code in python source files
     cmds:
       - .venv/bin/ruff check --no-fix .
     deps: [install]
 
   check:
-    desc:
+    desc: Check type annotation in python source files
     cmds:
       - .venv/bin/mypy .
     deps: [install]
 
   test:
-    desc:
+    desc: Run defined tests
     cmds:
-      - .venv/bin/mypy .
+      - .venv/bin/pytest
     deps: [install]
   
   requirements-dev:
