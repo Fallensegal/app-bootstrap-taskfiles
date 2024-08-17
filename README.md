@@ -14,12 +14,33 @@ Each task file in labeled as `LANGUAGE-taskfile.dist.yaml`. For example, for **P
 
 - Move the taskfile to a directory of your choice
 - Rename the file from `LANGUAGE-taskfile.dist.yaml` to `taskfile.dist.yaml`
-- Run `task`
+- Run `task` to see all the available targets
 
 ### Example
 
 ```bash
-$ mv ~/Downloads/Python-taskfile.dist.yaml <project-path>/taskfile.dist.yaml
+$ mv ~/Downloads/Python-taskfile.dist.yaml <project-path>/Taskfile.dist.yaml
 $ task
+```
+
+```bash
+task: Available tasks for this project:
+* install:       Install dev dependencies
+* format:        Format code in python source files
+* lint:          Lint code in python source files
+* check:         Check type annotation in python source files
+* test:          Run defined tests
+* init:          Initialize local dev environment
+```
+### Setting Up a Project
+
+Run:
+
+```bash
+$ task init
+```
+After completion, run,
+```bash
+$ task install
 ```
 

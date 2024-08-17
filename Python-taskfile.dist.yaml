@@ -14,7 +14,7 @@ tasks:
       - task: test
 
   install:
-    desc: Install Python Dev Dependencies
+    desc: Install dev dependencies
     run: once
     cmds:
       - uv venv .venv
@@ -71,6 +71,7 @@ tasks:
       - requirements.txt
 
   init:
+    desc: Initialize local dev environment
     cmds:
       - task: init:git
       - task: init:devbox
